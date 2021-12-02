@@ -1,6 +1,9 @@
 #include <ESP8266WiFi.h>
 #include "FirebaseESP8266.h"
 
+// ID de la planta
+String ID = "P001";
+
 // Credenciales wifi
 #define ssid "INFINITUM3198_2.4"
 #define password "MGB7du6ZTu"
@@ -12,11 +15,11 @@ const char *FIREBASE_AUTH="ZuM0pmh3aC5iS6a8oJLHdsWIkfgshUf4Z0vAmKFd";
 FirebaseData firebaseData;
 
 // Constantes de sensor de humedad
-const int dry = 696;
+const int dry = 600;
 const int wet = 336;
 
 // Variables para la bomba de agua
-bool regar = true;
+bool regar = false;
 
 void setup() {
   // Iniciar pin de bomba de agua
@@ -24,7 +27,7 @@ void setup() {
   digitalWrite(D0, HIGH);
 
   // Monitor serial
-  Serial.begin(9600);
+  Serial.begin(19200);
   Serial.println();
 
   // Conectar a WiFi
@@ -43,8 +46,6 @@ void setup() {
 }
 
 
-
-
 void loop() {
 
   // Leer sensor de humedad
@@ -59,8 +60,8 @@ void loop() {
   Serial.println();
   
   // Subir datos a Firebase
-  Firebase.pushInt(firebaseData, "Planta1/humedad-de-la-tierra-historia", percentageMoisture);
-  Firebase.setInt(firebaseData, "Planta1/humedad-de-la-tierra-actual", percentageMoisture);
+  Firebase.pushInt(firebaseData, ID + "/humedad-de-la-tierra-historia", percentageMoisture);
+  Firebase.setInt(firebaseData, ID + "/humedad-de-la-tierra-actual", percentageMoisture);
 
   while(regar){
   // Loop de la bomba de agua
@@ -70,6 +71,17 @@ void loop() {
   regar = false;
   
   }
+
+  // Sensor de nivel del agua
+  int hayAgua = digitalRead(D1);
+
+  if(hayAgua){
+    Serial.println("Sí hay agua");
+    Serial.println();
+    } else {
+    Serial.println("No hay agua");
+    Serial.println();
+      }
 
   delay(3000);
 
