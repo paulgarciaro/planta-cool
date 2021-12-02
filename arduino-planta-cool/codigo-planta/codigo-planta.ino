@@ -11,6 +11,10 @@ const char *FIREBASE_HOST="https://planta-cool-default-rtdb.firebaseio.com/a";
 const char *FIREBASE_AUTH="ZuM0pmh3aC5iS6a8oJLHdsWIkfgshUf4Z0vAmKFd";
 FirebaseData firebaseData;
 
+// Constantes de sensor de humedad
+const int dry = 696;
+const int wet = 336;
+
 void setup() {
   // Pines
   pinMode(D0,OUTPUT);
@@ -39,9 +43,20 @@ void setup() {
 
 void loop() {
 
+  // Leer sensor de humedad
+  int sensorVal = analogRead(A0);
+  Serial.print(sensorVal);
+  Serial.println();
+
+  int percentageMoisture = map(sensorVal, wet, dry, 100, 0);
+
+  Serial.print(percentageMoisture);
+  Serial.println("%");
+  Serial.println();
+  
   // Subir datos a Firebase
-  Firebase.pushInt(firebaseData, "Planta1/humedad-de-la-tierra-historia", 88888);
-  Firebase.setInt(firebaseData, "Planta1/humedad-de-la-tierra-actual", 99999);
+  Firebase.pushInt(firebaseData, "Planta1/humedad-de-la-tierra-historia", percentageMoisture);
+  Firebase.setInt(firebaseData, "Planta1/humedad-de-la-tierra-actual", percentageMoisture);
 
   
   // Loop de la bomba de agua
