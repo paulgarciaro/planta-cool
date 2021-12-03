@@ -41,7 +41,28 @@ class ViewController: UIViewController {
             
             // Label del tanque
             
+            let etiquetaA = UILabel(frame: CGRect(x:20, y:650, width: self.view.frame.size.width-40, height:50))
+            
+            var tanqueValor: AnyObject
+            
+            if humedadValor["tanque"] != nil {
+                tanqueValor = humedadValor["tanque"] as AnyObject
+                etiquetaA.text = "\(tanqueValor)"
+            }
+            
+            etiquetaA.textAlignment = NSTextAlignment.center
+            etiquetaA.font = UIFont(name: "Helvetica", size: 40)
+            etiquetaA.backgroundColor  = UIColor.white
+            self.view.addSubview(etiquetaA)
+            
         })
+        
+        let etiquetaTanque = UILabel(frame: CGRect(x:20, y:600, width:view.frame.size.width-40, height:50))
+        
+        etiquetaTanque.textAlignment = NSTextAlignment.center
+        etiquetaTanque.text = "Estado del tanque:"
+        etiquetaTanque.font = UIFont(name: "Helvetica", size:30)
+        self.view.addSubview(etiquetaTanque)
         
         let etiquetaHumedad = UILabel(frame: CGRect(x:20, y:200, width:view.frame.size.width-40, height:100))
         
