@@ -47,7 +47,11 @@ class ViewController: UIViewController {
             
             if humedadValor["tanque"] != nil {
                 tanqueValor = humedadValor["tanque"] as AnyObject
-                etiquetaA.text = "\(tanqueValor)"
+                if "\(tanqueValor)" == "1" {
+                    etiquetaA.text = "Sí hay agua"
+                } else {
+                    etiquetaA.text = "No hay agua"
+                }
             }
             
             etiquetaA.textAlignment = NSTextAlignment.center

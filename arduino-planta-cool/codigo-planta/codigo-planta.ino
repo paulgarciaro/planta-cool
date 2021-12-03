@@ -5,8 +5,8 @@
 String ID = "P001";
 
 // Credenciales wifi
-#define ssid "INFINITUM3198_2.4"
-#define password "MGB7du6ZTu"
+#define ssid "iPhone de Paul"
+#define password "12345678"
 
 // Credenciales de Firebase
 #define API_KEY "AIzaSyA3AX7f-vt0YXHrw-M9utADT8kYjqEFsdA"
@@ -19,7 +19,7 @@ const int dry = 600;
 const int wet = 336;
 
 // Variables para la bomba de agua
-bool regar = false;
+int regar = 0;
 
 void setup() {
   // Iniciar pin de bomba de agua
@@ -48,6 +48,9 @@ void setup() {
 
 void loop() {
 
+  Firebase.getInt(firebaseData, ID + "/regar");
+  regar = firebaseData.intData();
+
   // Leer sensor de humedad
   int sensorVal = analogRead(A0);
   Serial.print(sensorVal);
@@ -59,16 +62,23 @@ void loop() {
   Serial.println("%");
   Serial.println();
   
-  // Subir datos a Firebase
-  Firebase.pushInt(firebaseData, ID + "/humedad-de-la-tierra-historia", percentageMoisture);
-  Firebase.setInt(firebaseData, ID + "/humedad-de-la-tierra-actual", percentageMoisture);
+  // Subir datos de la humedad a Firebase
+  Firebase.setInt(firebaseData, ID + "/humedad", percentageMoisture);
+
+  //Regar
+
+  if(percentageMoisture < 50){
+    regar = 1;
+    }
+  
 
   while(regar){
   // Loop de la bomba de agua
   digitalWrite(D0, LOW);
   delay(1000);
   digitalWrite(D0, HIGH);
-  regar = false;
+  regar = 0;
+  Firebase.setInt(firebaseData, ID + "/regar", 0);
   
   }
 
@@ -77,9 +87,11 @@ void loop() {
 
   if(hayAgua){
     Serial.println("Sí hay agua");
+    Firebase.setInt(firebaseData, ID + "/tanque", true);
     Serial.println();
     } else {
     Serial.println("No hay agua");
+    Firebase.setInt(firebaseData, ID + "/tanque", false);
     Serial.println();
       }
 
