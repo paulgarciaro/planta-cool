@@ -20,6 +20,7 @@ const int wet = 336;
 
 // Variables para la bomba de agua
 int regar = 0;
+int mililitros = 0;
 
 void setup() {
   // Iniciar pin de bomba de agua
@@ -42,6 +43,14 @@ void setup() {
   // Iniciar Firebase
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
+
+  // mililitros contador
+
+  Serial.println();
+  Serial.print("Mililitros: ");
+  Serial.print(mililitros);
+  Firebase.getInt(firebaseData, ID + "/mililitros");
+  mililitros = firebaseData.intData();
   
 }
 
@@ -65,24 +74,13 @@ void loop() {
   // Subir datos de la humedad a Firebase
   Firebase.setInt(firebaseData, ID + "/humedad", percentageMoisture);
 
-  //Regar
+  //Regar si no está humeda
 
   if(percentageMoisture < 50){
     regar = 1;
     }
-  
 
-  while(regar){
-  // Loop de la bomba de agua
-  digitalWrite(D0, LOW);
-  delay(1000);
-  digitalWrite(D0, HIGH);
-  regar = 0;
-  Firebase.setInt(firebaseData, ID + "/regar", 0);
-  
-  }
-
-  // Sensor de nivel del agua
+   // Sensor de nivel del agua
   int hayAgua = digitalRead(D1);
 
   if(hayAgua){
@@ -94,6 +92,41 @@ void loop() {
     Firebase.setInt(firebaseData, ID + "/tanque", false);
     Serial.println();
       }
+
+
+// regar
+  
+
+  while(regar){
+  // Loop de la bomba de agua
+  digitalWrite(D0, LOW);
+  delay(1000);
+  digitalWrite(D0, HIGH);
+  regar = 0;
+  Firebase.setInt(firebaseData, ID + "/regar", 0);
+
+  // mililitros contador
+  if(hayAgua){
+  Serial.println();
+  Serial.print("Mililitros: ");
+  Serial.print(mililitros);
+  mililitros = mililitros + 25;
+  Firebase.setInt(firebaseData, ID + "/mililitros", mililitros);
+  Serial.print(mililitros);
+  } else {
+  Serial.println();
+  Serial.print("Mililitros: ");
+  Serial.print(mililitros);
+  mililitros = mililitros;
+  Firebase.setInt(firebaseData, ID + "/mililitros", mililitros);
+  Serial.print(mililitros);
+    
+    }
+  
+  }
+
+
+  
 
   delay(3000);
 
